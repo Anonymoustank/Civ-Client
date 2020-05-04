@@ -47,7 +47,7 @@ class AI() {
             
         }
 
-        if(players[playerIndex].resources[ResourceType.Trade]!! >= 20){
+        if(players[playerIndex].resources[ResourceType.Trade]!! >= 24){
             if (players[playerIndex].workers? == null) println("This player doesn't have workers")
             else{
                 for(worker in players[playerIndex].workers){
