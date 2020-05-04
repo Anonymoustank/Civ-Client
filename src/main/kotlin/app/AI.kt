@@ -1,5 +1,7 @@
 package app
 
+import kotlin.math.abs as abs 
+
 // EDIT THIS FILE
 
 class AI() {
@@ -40,17 +42,54 @@ class AI() {
 
         // for example, produce a worker on one of our cities if we have enough production
         if(players[playerIndex].resources[ResourceType.Production]!! >= 8) {
-            doProduce(ProductionType.Worker, players[playerIndex].cities[0].position)
+                val randomInteger = (0..players[playerIndex].cities.size-1).shuffled().first()
+                doProduce(ProductionType.Worker, players[playerIndex].cities[randomInteger].position)
+            
         }
 
-        
+        if(players[playerIndex].resources[ResourceType.Trade]!! >= 20){
+            if (players[playerIndex].workers? == null) println("This player doesn't have workers")
+            else{
+                for(worker in players[playerIndex].workers){
+                    var city_num = 0
+                    for (i in 0..players[playerIndex].cities.size-1){
+                        if (worker.position == i.position) break
+                        else city_num++
+                    }
+                    if (city_num == players[playerIndex].cities.size) doProduce(ProductionType.City, worker.position)
+                }
+            }
+        }
 
        
-        //can do playerIndex-1, etc to scan other players
-        //indexes go from 0-3
+        for (i in list){
+            if (players[i].armies? == null) println("This player doesn't have armies")
+            else{
+            for(army in players[i].armies){
+                for(my_army in players[playerIndex].armies){
+                    val x_pos = my_army.position.first - army.position.first
+                    val x_pos_abs = abs(x_pos)
+                    val y_pos = my_army.position.second - army.position.second
+                    val y_pos_abs = abs(y_pos)
 
-        // another example: move all armies to the right one unit(why not?)
-
+                    if (x_pos_abs == 1 && y_pos_abs == 1){
+                        doMoveArmy(my_army.position, Pair(my_army.position.first, my_army.position.second))
+                    }
+                    else if (x_pos_abs == 1){
+                        if (getCombatMultiplier(Pair(my_army.position.first, my_army.position.second)) - getCombatMultiplier(Pair(army.position.first, army.position.second)) >= 0){
+                            doMoveArmy(my_army.position, Pair(army.position.first, my_army.position.second))
+                        }
+                    }
+                    else if (y_pos_abs == 1){
+                        if (getCombatMultiplier(Pair(my_army.position.first, my_army.position.second)) - getCombatMultiplier(Pair(army.position.first, army.position.second)) >= 0){
+                            doMoveArmy(my_army.position, Pair(my_army.position.first, army.position.second))
+                        }
+                    }
+                    
+                }
+            }
+        }
+        }
         // BoardUnit.isValidMove, ex: army.isValidMove(position)
         //army.position.first = x, army.position.second = y
         for(army in players[playerIndex].armies) {
