@@ -7,7 +7,7 @@ import kotlin.math.abs as abs
 class AI() {
     // Change the name that shows up on the graphical display
     // optional, but HIGHLY RECOMMENCED
-    fun getName() = "Sample AI Template"
+    fun getName() = "pkadekodi"
 
     // make a move
     // map is the game map
@@ -34,20 +34,24 @@ class AI() {
         for (i in list){
 			if (i == playerIndex) list.remove(playerIndex)
 		}
-        // make moves
+        // Check how much food there is before making worker/army
 
         val player1 = list[0]
         val player2 = list[1]
         val player3 = list[2]
 
         // for example, produce a worker on one of our cities if we have enough production
-        if(players[playerIndex].resources[ResourceType.Production]!! >= 8) {
+        if(players[playerIndex].resources[ResourceType.Production]!! >= 8 && players[playerIndex].workers.size < players[playerIndex].cities.size && players[playerIndex].workers.size + players[playerIndex].armies.size + 1 <= players[playerIndex].resources[ResourceType.Food]!!) {
                 val randomInteger = (0..players[playerIndex].cities.size-1).shuffled().first()
                 doProduce(ProductionType.Worker, players[playerIndex].cities[randomInteger].position)
-            
         }
 
-        if(players[playerIndex].resources[ResourceType.Trade]!! >= 24){
+        if players[playerIndex].resources[ResourceType.Production]!! >= 8 && players[playerIndex].armies.size < players[playerIndex].cities.size && players[playerIndex].workers.size + players[playerIndex].armies.size + 1 <= players[playerIndex].resources[ResourceType.Food]!!) {
+            val randomInteger = (0..players[playerIndex].cities.size-1).shuffled().first()
+            doProduce(ProductionType.Army, players[playerIndex].cities[randomInteger].position)
+        }
+
+        if(players[playerIndex].resources[ResourceType.Production]!! >= 24){
             if (players[playerIndex].workers? == null) println("This player doesn't have workers")
             else{
                 for(worker in players[playerIndex].workers){
@@ -93,7 +97,10 @@ class AI() {
         // BoardUnit.isValidMove, ex: army.isValidMove(position)
         //army.position.first = x, army.position.second = y
         for(army in players[playerIndex].armies) {
-            doMoveArmy(army.position, Pair(army.position.first + 1, army.position.second))
+            if (getCombatMultiplier(Pair(army.position.first, army.position.second)) < getCombatMultiplier(Pair(army.position.first + 1, army.position.second))) doMoveArmy(army.position, Pair(army.position.first + 1, army.position.second))
+            else if (getCombatMultiplier(Pair(army.position.first, army.position.second)) < getCombatMultiplier(Pair(army.position.first - 1, army.position.second))) doMoveArmy(army.position, Pair(army.position.first - 1, army.position.second))
+            else if (getCombatMultiplier(Pair(army.position.first, army.position.second)) < getCombatMultiplier(Pair(army.position.first, army.position.second + 1))) doMoveArmy(army.position, Pair(army.position.first, army.position.second + 1))
+            else if (getCombatMultiplier(Pair(army.position.first, army.position.second)) < getCombatMultiplier(Pair(army.position.first, army.position.second - 1))) doMoveArmy(army.position, Pair(army.position.first, army.position.second - 1))
         }
     }
 }
